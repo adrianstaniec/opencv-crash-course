@@ -57,7 +57,7 @@ cv2.imshow("Warped original", warped)
 cv2.waitKey(0)
 
 warped_grey = cv2.cvtColor(warped, cv2.COLOR_BGR2GRAY)
-T = threshold_local(warped_grey, 11, offset=10, method='gaussian')
+T = threshold_local(warped_grey, 55, offset=20, method='gaussian')
 threshed = (warped_grey > T).astype(np.uint8) * 255
 cv2.imshow("Warped, greyed and thresholded", threshed)
 cv2.waitKey(0)
