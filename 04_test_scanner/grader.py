@@ -10,7 +10,7 @@ BLUE = (255, 0, 0)
 GREEN = (0, 255, 0)
 RED = (0, 0, 255)
 
-DEBUG = False
+DEBUG = True
 
 CORRECT_ANSWERS = {1: "A", 2: "C", 3: "D", 4: "E", 5: "B"}
 
@@ -148,17 +148,21 @@ def extract_anwers_from_img(img):
         for bubble in row:
             mask = np.zeros(img_bw.shape, dtype="uint8")
             cv2.drawContours(mask, [bubble], -1, 255, cv2.FILLED)
-
             mask = cv2.bitwise_and(img_bw, img_bw, mask=mask)
             total = cv2.countNonZero(mask)
             pixels_colored.append(total)
-        bubbled = ["A", "B", "C", "D", "E"][np.argmax(pixels_colored)]
-        return bubbled
+        return np.argmax(pixels_colored)
 
     extracted_answers = [
         extract_answer_of_one_question(doc_bw, row)
         for row in bubble_contours_grouped_and_sorted
     ]
+
+    for row, answer in zip(bubble_contours_grouped_and_sorted, extracted_answers):
+        cv2.drawContours(doc, [row[answer]], -1, (200, 000, 200), 2)
+    cv2.imshow("bubbled", doc)
+    cv2.waitKey(0)
+
 
     return extracted_answers
 
@@ -187,10 +191,13 @@ def main():
 
     for i, test in enumerate(tests, 1):
         answers = extract_anwers_from_img(test)
+        answers = [["A", "B", "C", "D", "E"][i] for i in answers]
         score = grade(answers, CORRECT_ANSWERS)
         print(f"\nStudent #{i}:")
         print(f"  answers: {answers}")
         print(f"  score:   {score}/5")
+        global DEBUG
+        DEBUG = False
 
 
 if __name__ == "__main__":
